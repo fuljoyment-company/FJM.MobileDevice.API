@@ -1,0 +1,6 @@
+@FJM.Services.MobileDevice.API_HostAddress = http://localhost:5210
+
+GET {{FJM.Services.MobileDevice.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
