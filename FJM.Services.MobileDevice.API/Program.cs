@@ -61,8 +61,8 @@ public class Program
                 Version = "v1",
                 Description = ""
             });
-            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
         // Add CORS services
         builder.Services.AddCors(options =>
