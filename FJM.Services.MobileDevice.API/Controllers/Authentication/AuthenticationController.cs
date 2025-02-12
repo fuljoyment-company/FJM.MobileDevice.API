@@ -1,9 +1,6 @@
 ﻿using FJM.Services.MobileDevice.API.Authentication;
-using fuljoymentMobileServiceBinder.Interface;
-using fuljoymentMobileServiceBinder.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
+using FJM.Services.MobileDevice.BusinessLogic.Services;
+using FJM.Services.MobileDevice.Models.DataTransferObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -12,65 +9,68 @@ namespace FJM.Services.MobileDevice.API.Controllers.Authentication
     [Route("api/[controller]")]
     [ApiController]
     public class AuthenticationController : ControllerBase
-    {
+    {        
+        #region Fields
         private readonly ApiSettings _apiSettings;
         private IConfiguration _configuration;
-        #region Fields
-        private readonly IForMobilesService _forMobilesClient;
+        private readonly IForMobileService _mobileService;
+        private UserTransferObject _loggedInUser;
         #endregion
-        public AuthenticationController(IConfiguration configuration, IOptions<ApiSettings> apiSettingsOptions,IForMobilesService forMobilesClient)
+
+        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration settings.</param>
+        /// <param name="mobileService">Service handling authentication for mobile devices.</param>
+        /// <param name="apiSettingsOptions">Options containing API settings.</param>
+        public AuthenticationController(IConfiguration configuration, IForMobileService mobileService, IOptions<ApiSettings> apiSettingsOptions)
         {
             _configuration = configuration;
             _apiSettings = apiSettingsOptions.Value;
-            _forMobilesClient = forMobilesClient;
+            _mobileService = mobileService;
         }
+        #endregion
+
         #region Methods
+        /// <summary>
+        /// Authenticates a user attempting to log in to a mobile device.
+        /// </summary>
+        /// <param name="request">The login request containing user credentials.</param>
+        /// <returns>
+        /// Returns an HTTP response containing:
+        /// - <see cref="UserTransferObject"/> if authentication is successful.
+        /// - A <see cref="BadRequestResult"/> if the request data is invalid.
+        /// - An <see cref="UnauthorizedResult"/> if authentication fails due to invalid credentials.
+        /// - A <see cref="StatusCodeResult"/> (500) if an internal server error occurs.
+        /// </returns>
         [HttpPost("LoginToMobileDevice")]
         public async Task<ActionResult<UserTransferObject>> LoginToMobileDeviceAsync([FromBody] UserLoginOrLogoutRequest request)
         {
             try
             {
-                if (HttpContext.Request.Headers.TryGetValue("ApiKey", out var apiKeyHeader))
-                {
-                    string apiKey = apiKeyHeader.FirstOrDefault();
-                    var validApiKey = _configuration["ApiKey"]; 
+                
+                if (request == null)
+                    return BadRequest(new { message = "Invalid request data." });
 
-                    if (apiKey == validApiKey)
-                    {
-                        return await AuthenticateAsync(request);
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status401Unauthorized,
-                            new Response { Status = "Error", Message = "Invalid API Key." });
-                    }
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status404NotFound,
-                        new Response { Status = "Error", Message = "API Key is not present in the header" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500,
-                    new Response { Status = "Error", Message = $"An error occurred: {ex.Message}" });
-            }
-        }
+                var response = await _mobileService.LoginToMobileDevice(request);
 
-        private async Task<ActionResult<UserTransferObject>> AuthenticateAsync([FromBody] UserLoginOrLogoutRequest request)
-        {
-            try
-            {
-                var response = await _forMobilesClient.LoginToMobileDeviceAsync(request);
-                if (response.Messages?.Length > 0)
-                    return BadRequest(response.Messages);
+                if (response == null || response.Messages == null)
+                    return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
+
+                if (response.Messages.Any(m => m.Message == "Invalid credentials" || m.Message.StartsWith("An error occurred")))
+                {
+                    return Unauthorized(new { message = response.Messages });
+                }
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                
+                return StatusCode(500, new { message = "An internal server error occurred. Please try again later." });
             }
+
         }
         #endregion
     }

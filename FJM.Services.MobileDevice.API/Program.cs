@@ -1,6 +1,8 @@
 using FJM.Services.MobileDevice.API.Middleware;
-using fuljoymentMobileServiceBinder.Interface;
-using fuljoymentMobileServiceBinder.Services;
+using FJM.Services.MobileDevice.BusinessLogic.Repositories;
+using FJM.Services.MobileDevice.BusinessLogic.Services;
+using FJM.Services.MobileDevice.Models.DataModels;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.ServiceModel;
@@ -10,44 +12,19 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+       
         //
         builder.Configuration
                         .SetBasePath(Directory.GetCurrentDirectory())
                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                         .AddEnvironmentVariables();
-
+        builder.Services.AddDbContext<MobileDeviceDbContext>(options =>
+   options.UseSqlServer(builder.Configuration.GetConnectionString("MobileDeviceCon")));
         var env = builder.Configuration["Environment"] ?? "Development";
         builder.Environment.EnvironmentName = env;
-
-        //Checking Environment
-        if (env == "Production")
-        {
-            builder.Services.AddScoped(_ => new SSLfuljoymentMobileService.ForMobilesClient(
-                SSLfuljoymentMobileService.ForMobilesClient.EndpointConfiguration.BasicHttpBinding_IForMobiles,
-                new EndpointAddress("https://www.fuljoyment.com/forMobiles/Android2024/ForMobiles.svc")));
-
-            builder.Services.AddScoped<IForMobilesService>(provider =>
-            {
-                var client = provider.GetRequiredService<SSLfuljoymentMobileService.ForMobilesClient>();
-                return new SslfuljoymentMobileServiceAdapter(client); // Ensure this adapter implements IForMobilesService
-            });
-        }
-        else if (env == "Development")
-        {
-            builder.Services.AddScoped(_ => new TestfuljoymentMobileService.ForMobilesClient(
-                TestfuljoymentMobileService.ForMobilesClient.EndpointConfiguration.BasicHttpBinding_IForMobiles,
-                new EndpointAddress("https://www.fuljoyment.com/forMobiles/202001test/ForMobiles.svc")));
-
-            builder.Services.AddScoped<IForMobilesService>(provider =>
-            {
-                var client = provider.GetRequiredService<TestfuljoymentMobileService.ForMobilesClient>();
-                return new TestfuljoymentMobileServiceAdapter(client); 
-            });
-        }
-        else
-        {
-            throw new InvalidOperationException($"Unknown environment: {env}");
-        }
+        builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+        builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        builder.Services.AddScoped<IForMobileService, ForMobileService>();
         //Add services to the container.
         builder.Services.AddSingleton<HttpClient>();
         builder.Services.AddControllers();
@@ -76,7 +53,7 @@ public class Program
         });
         var app = builder.Build();
         // Use API Key Middleware
-        app.UseMiddleware<ApiKeyMiddleware>();
+       // app.UseMiddleware<ApiKeyMiddleware>();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         if (app.Environment.IsDevelopment())

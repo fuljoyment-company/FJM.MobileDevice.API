@@ -24,6 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FJM.Services.MobileDevice.BusinessLogic\FJM.Services.MobileDevice.BusinessLogic.csproj" />
+    <ProjectReference Include="..\FJM.Services.MobileDevice.Models\FJM.Services.MobileDevice.Models.csproj" />
     <ProjectReference Include="..\fuljiymentMobileServiceBinder\fuljoymentMobileServiceBinder.csproj" />
   </ItemGroup>
 

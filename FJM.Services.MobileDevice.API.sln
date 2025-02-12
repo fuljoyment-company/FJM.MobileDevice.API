@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FJM.Services.MobileDevice.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fuljoymentMobileServiceBinder", "fuljiymentMobileServiceBinder\fuljoymentMobileServiceBinder.csproj", "{A6EAD631-7BFF-489A-98E7-85DB00A1215D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FJM.Services.MobileDevice.Models", "FJM.Services.MobileDevice.Models\FJM.Services.MobileDevice.Models.csproj", "{55AEE895-B236-4ADA-87DA-B1D31CED45E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FJM.Services.MobileDevice.BusinessLogic", "FJM.Services.MobileDevice.BusinessLogic\FJM.Services.MobileDevice.BusinessLogic.csproj", "{952E5D08-03C6-448B-878A-380F01DD302D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{A6EAD631-7BFF-489A-98E7-85DB00A1215D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6EAD631-7BFF-489A-98E7-85DB00A1215D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6EAD631-7BFF-489A-98E7-85DB00A1215D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55AEE895-B236-4ADA-87DA-B1D31CED45E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AEE895-B236-4ADA-87DA-B1D31CED45E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55AEE895-B236-4ADA-87DA-B1D31CED45E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55AEE895-B236-4ADA-87DA-B1D31CED45E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{952E5D08-03C6-448B-878A-380F01DD302D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{952E5D08-03C6-448B-878A-380F01DD302D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{952E5D08-03C6-448B-878A-380F01DD302D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{952E5D08-03C6-448B-878A-380F01DD302D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
